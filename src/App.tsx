@@ -2,101 +2,61 @@ import {
   addEdge,
   Connection,
   Controls,
+  Edge,
   MiniMap,
   ReactFlow,
-  useEdgesState,
-  useNodesState,
+  ReactFlowProvider,
 } from "@xyflow/react";
 import "@xyflow/react/dist/base.css";
 import "./App.css";
 import { useCallback } from "react";
 import DynamicNode from "./nodes/dynamic";
-
-const initNodes = [
-  {
-    id: "1",
-    type: "dynamic",
-    data: {
-      data: {
-        name: "Jane Doe",
-        job: "CEO",
-        emoji: "😎",
-      },
-      inputs: [
-        {
-          id: "input1",
-          name: "Input 1",
-          data_type: "json",
-          required: false,
-        },
-        {
-          id: "input2",
-          name: "Input 2",
-          data_type: "json",
-          required: false,
-        },
-      ],
-      outputs: [
-        {
-          id: "output1",
-          name: "Output 1",
-          data_type: "json",
-          display_type: "JSON",
-        },
-        {
-          id: "output2",
-          name: "Output 2",
-          data_type: "json",
-          display_type: "JSON",
-        },
-      ],
-    },
-    inputs: [],
-
-    position: { x: 0, y: 50 },
-  },
-];
-
-const initEdges = [];
+import { store, actions } from "./stores/flow";
+import WithCopyPaste from "./copyandpaste";
+import { useSnapshot } from "valtio";
 
 const nodeTypes = {
   dynamic: DynamicNode,
 };
 
-const isValidConnection = (connection: Connection) => {
-  const { source, target } = connection;
-  if (source === target) {
-    return false;
+// 校验连接的合法性
+const isValidConnection = (connectionOrEdge: Connection | Edge) => {
+  if ("source" in connectionOrEdge && "target" in connectionOrEdge) {
+    return connectionOrEdge.source !== connectionOrEdge.target;
   }
-
   return true;
 };
 
 function App() {
-  const [nodes, setNodes, onNodesChange] = useNodesState(initNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
-
-  const onConnect = useCallback(
-    (params: unknown) => setEdges((eds) => addEdge(params, eds)),
-    []
-  );
+  const snap = useSnapshot(store);
+  const onConnect = useCallback((params: Connection) => {
+    const newEdge = addEdge(params, store.edges);
+    console.log(newEdge)
+    actions.setEdges(newEdge); // 设置新的边集合
+  }, []);
 
   return (
     <>
-      <ReactFlow
-        isValidConnection={isValidConnection}
-        nodes={nodes}
-        edges={edges}
-        onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
-        onConnect={onConnect}
-        nodeTypes={nodeTypes}
-        fitView
-        className="bg-teal-50"
-      >
-        <MiniMap />
-        <Controls />
-      </ReactFlow>
+      <ReactFlowProvider>
+        <WithCopyPaste>
+          <ReactFlow
+            isValidConnection={isValidConnection}
+            nodes={snap.nodes}
+            edges={snap.edges}
+            onNodesChange={actions.onNodesChange}
+            onEdgesChange={actions.onEdgesChange}
+            onConnect={onConnect}
+            onNodeClick={(_, node) => actions.setSelectedNode(node)}
+            onPaneClick={() => actions.setSelectedNode(null)}
+            nodeTypes={nodeTypes}
+            fitView
+            className="bg-teal-50"
+          >
+            <MiniMap />
+            <Controls />
+          </ReactFlow>
+        </WithCopyPaste>
+      </ReactFlowProvider>
     </>
   );
 }

@@ -1,4 +1,4 @@
-import { ComponentType, memo } from "react";
+import { ComponentType } from "react";
 import { Handle, Position } from "@xyflow/react";
 
 export interface Endpoint {
