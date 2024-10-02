@@ -1,31 +1,8 @@
 import { ComponentType } from "react";
 import { Handle, Position } from "@xyflow/react";
+import { CustomNodeData } from "../node-types";
 
-export interface Endpoint {
-  id: string;
-  name: string;
-  description: string;
-  required: boolean;
-  data_type: string;
-  display_type: string;
-}
-
-export interface BaseNodeDataProps {
-  data: Record<string, unknown>;
-  inputs: Endpoint[];
-  outputs: Endpoint[];
-}
-
-export interface BaseNodeProps {
-  id: string;
-  name: string;
-  node_type: string;
-  component: string;
-  status: string;
-  data: BaseNodeDataProps;
-}
-
-export function withBaseNode<T extends BaseNodeProps>(
+export function withBaseNode<T extends { data: CustomNodeData }>(
   WrappedComponent: ComponentType<T>
 ) {
   return function BaseNodeWrapper(props: T) {

@@ -1,20 +1,17 @@
-import { memo } from "react";
-import { withBaseNode, BaseNodeProps } from "./base"; // 假设路径
+import { DynamicNodeProps } from '../node-types';
 
-function Node(props: BaseNodeProps) {
-  const { data } = props.data;
+
+function DynamicNode(props: DynamicNodeProps) {
+  const { data, selected } = props;
 
   return (
-    <div className="dynamic-node-content">
-      {/* 这里根据 data_schema 和 data_ui_schema 动态渲染 UI */}
-      <div className="text-lg font-bold">{props.name}</div>
+    <div className={`dynamic-node-content ${selected ? 'selected' : ''}`}>
       <div>
-        {/* 渲染数据 */}
-        <pre>{JSON.stringify(data, null, 2)}</pre>
+        {/* 渲染自定义数据 */}
+        <pre>{JSON.stringify(data.data, null, 2)}</pre>
       </div>
     </div>
   );
 }
 
-const DynamicNode = memo(withBaseNode(Node));
 export default DynamicNode;

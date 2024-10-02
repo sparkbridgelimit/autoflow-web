@@ -1,8 +1,9 @@
-import { Edge, EdgeChange, Node, NodeChange, applyNodeChanges, applyEdgeChanges  } from "@xyflow/react";
+import { EdgeChange, NodeChange, applyNodeChanges, applyEdgeChanges  } from "@xyflow/react";
 import { nanoid } from "nanoid";
 import { proxy } from 'valtio'
+import { FlowEdge, FlowNode } from "../node-types";
 
-const initNodes: CustomNode[] = [
+const initNodes: FlowNode[] = [
   {
     id: "1",
     type: "dynamic",
@@ -45,47 +46,16 @@ const initNodes: CustomNode[] = [
   },
 ];
 
-// 定义Node的data字段接口
-interface NodeData extends Record<string, unknown> {
-  data: {
-    name: string;
-    job: string;
-    emoji: string;
-  };
-  inputs: Array<{
-    id: string;
-    name: string;
-    data_type: string;
-    required: boolean;
-  }>;
-  outputs: Array<{
-    id: string;
-    name: string;
-    data_type: string;
-    display_type: string;
-  }>;
-}
-
-// 使用Node时包含自定义的NodeData
-export type CustomNode = Node<NodeData> & {
-  style?: React.CSSProperties;
-  className?: string;
-  resizing?: boolean;
-  focusable?: boolean;
-};
-
-export type CustomEdge = Edge;
-
 interface HistoryState {
-  nodes: CustomNode[];
-  edges: CustomEdge[];
+  nodes: FlowNode[];
+  edges: FlowEdge[];
 }
 
 interface FlowStoreState {
-  nodes: CustomNode[];
-  edges: CustomEdge[];
-  clipboard: CustomNode | null;
-  selectedNode: CustomNode | null;
+  nodes: FlowNode[];
+  edges: FlowEdge[];
+  clipboard: FlowNode | null;
+  selectedNode: FlowNode | null;
   history: HistoryState[];
   historyIndex: number;
   maxHistoryLength: number;
@@ -103,24 +73,24 @@ export const store = proxy<FlowStoreState>({
 
 export const actions = {
   // 设置节点
-  setNodes(nodes: CustomNode[]) {
+  setNodes(nodes: FlowNode[]) {
     store.nodes = nodes;
     actions.addHistory();
   },
 
   // 设置边
-  setEdges(edges: CustomEdge[]) {
+  setEdges(edges: FlowEdge[]) {
     store.edges = edges;
     actions.addHistory();
   },
 
   // 设置剪贴板
-  setClipboard(node: CustomNode | null) {
+  setClipboard(node: FlowNode | null) {
     store.clipboard = node;
   },
 
   // 设置选中的节点
-  setSelectedNode(node: CustomNode | null) {
+  setSelectedNode(node: FlowNode | null) {
     store.selectedNode = node;
   },
 
@@ -194,17 +164,17 @@ export const actions = {
       console.log('剪贴板为空');
     }
   },
-  onNodesChange(changes: NodeChange<CustomNode>[]) {
+  onNodesChange(changes: NodeChange<FlowNode>[]) {
     store.nodes = applyNodeChanges(changes, store.nodes);
 
-    const selectedChanges = changes.filter((change: NodeChange<CustomNode>) => change.type === 'select');
+    const selectedChanges = changes.filter((change: NodeChange<FlowNode>) => change.type === 'select');
     if (selectedChanges.length > 0) {
       const selectedNode = store.nodes.find((node) => node.id === selectedChanges[0].id) || null;
       store.selectedNode = selectedNode;  // 更新选中的节点
     }
   },
   // 处理边的变化
-  onEdgesChange(changes: EdgeChange<CustomEdge>[]) {
+  onEdgesChange(changes: EdgeChange<FlowEdge>[]) {
     store.edges = applyEdgeChanges(changes, store.edges);  // 使用applyEdgeChanges更新edges
   },
 }

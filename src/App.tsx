@@ -14,9 +14,12 @@ import DynamicNode from "./nodes/dynamic";
 import { store, actions } from "./stores/flow";
 import WithCopyPaste from "./copyandpaste";
 import { useSnapshot } from "valtio";
+import withBaseNode from "./nodes/base";
+import { FlowEdge, FlowNode } from "./node-types";
 
+// 使用注册的DynamicNode和其他自定义节点
 const nodeTypes = {
-  dynamic: DynamicNode,
+  dynamic: withBaseNode(DynamicNode),
 };
 
 // 校验连接的合法性
@@ -31,8 +34,7 @@ function App() {
   const snap = useSnapshot(store);
   const onConnect = useCallback((params: Connection) => {
     const newEdge = addEdge(params, store.edges);
-    console.log(newEdge)
-    actions.setEdges(newEdge); // 设置新的边集合
+    actions.setEdges(newEdge);
   }, []);
 
   return (
@@ -41,13 +43,11 @@ function App() {
         <WithCopyPaste>
           <ReactFlow
             isValidConnection={isValidConnection}
-            nodes={snap.nodes}
-            edges={snap.edges}
+            nodes={snap.nodes as FlowNode[]}
+            edges={snap.edges as FlowEdge[]}
             onNodesChange={actions.onNodesChange}
             onEdgesChange={actions.onEdgesChange}
             onConnect={onConnect}
-            onNodeClick={(_, node) => actions.setSelectedNode(node)}
-            onPaneClick={() => actions.setSelectedNode(null)}
             nodeTypes={nodeTypes}
             fitView
             className="bg-teal-50"
