@@ -31,10 +31,7 @@ export default function WithCopyPaste({ children }: WithCopyPasteProps) {
       ?.getBoundingClientRect();
 
     // 使用screenToFlowPosition进行坐标转换
-    const p = instance.screenToFlowPosition({
-      x: mousePositionRef.current.x - (rect?.left || 0),
-      y: mousePositionRef.current.y - (rect?.top || 0),
-    });
+    const p = instance.screenToFlowPosition(mousePositionRef.current);
 
     actions.pasteFromClipboard(p.x, p.y);
   };
