@@ -2,8 +2,6 @@ import { Link } from "react-router-dom";
 import {
   Home,
   Package,
-  Package2,
-  PanelLeft,
   Settings,
   ShoppingCart,
 } from "lucide-react";

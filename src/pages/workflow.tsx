@@ -15,6 +15,7 @@ import WithCopyPaste from "@/copyandpaste";
 import { useSnapshot } from "valtio";
 import withBaseNode from "@/nodes/base";
 import { FlowEdge, FlowNode } from "@/node-types";
+import NodePanel from "@/components/node-panel";
 
 const nodeTypes = {
   dynamic: withBaseNode(DynamicNode),
@@ -28,7 +29,7 @@ const isValidConnection = (connectionOrEdge: Connection | Edge) => {
   return true;
 };
 
-function Workflow () {
+function Workflow() {
   const snap = useSnapshot(store);
   const onConnect = useCallback((params: Connection) => {
     const newEdge = addEdge(params, store.edges);
@@ -37,24 +38,32 @@ function Workflow () {
 
   return (
     <>
-      <ReactFlowProvider>
-        <WithCopyPaste>
-          <ReactFlow
-            isValidConnection={isValidConnection}
-            nodes={snap.nodes as FlowNode[]}
-            edges={snap.edges as FlowEdge[]}
-            onNodesChange={actions.onNodesChange}
-            onEdgesChange={actions.onEdgesChange}
-            onConnect={onConnect}
-            nodeTypes={nodeTypes}
-            fitView
-            className="bg-teal-50"
-          >
-            <MiniMap />
-            <Controls />
-          </ReactFlow>
-        </WithCopyPaste>
-      </ReactFlowProvider>
+      <div
+        className="flex w-full min-h-screen"
+        style={{ height: "calc(-40px + 100vh)" }}
+      >
+        <NodePanel />
+        <div className="relative flex-1 overflow-auto">
+          <ReactFlowProvider>
+            <WithCopyPaste>
+              <ReactFlow
+                isValidConnection={isValidConnection}
+                nodes={snap.nodes as FlowNode[]}
+                edges={snap.edges as FlowEdge[]}
+                onNodesChange={actions.onNodesChange}
+                onEdgesChange={actions.onEdgesChange}
+                onConnect={onConnect}
+                nodeTypes={nodeTypes}
+                fitView
+                className="bg-teal-50"
+              >
+                <MiniMap />
+                <Controls />
+              </ReactFlow>
+            </WithCopyPaste>
+          </ReactFlowProvider>
+        </div>
+      </div>
     </>
   );
 }
