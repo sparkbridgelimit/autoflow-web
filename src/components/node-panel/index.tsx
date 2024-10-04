@@ -6,6 +6,7 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { useState } from "react";
+import NodeItem from "./item";
 
 export default function NodePanel() {
   // 使用 useState 控制哪个分组是展开的
@@ -56,14 +57,8 @@ export default function NodePanel() {
 
             <CollapsibleContent>
               <div className="grid grid-cols-2 gap-4">
-                {group.items.map((item) => (
-                  <div
-                    key={item.name}
-                    className="bg-slate-100 p-4 rounded-md shadow-sm flex flex-col cursor-pointer hover:bg-slate-200"
-                  >
-                    <div>{item.icon}</div>
-                    <div className="mt-2 select-none">{item.name}</div>
-                  </div>
+                {group.items.map((item, index) => (
+                  <NodeItem key={index} name={item.name} icon={item.icon} description={""} component={""} editComponent={""} category={""} data={item.data} />
                 ))}
               </div>
             </CollapsibleContent>

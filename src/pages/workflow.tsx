@@ -8,7 +8,7 @@ import {
   ReactFlowProvider,
 } from "@xyflow/react";
 import "@xyflow/react/dist/base.css";
-import { useCallback } from "react";
+import { useCallback, useRef } from "react";
 import DynamicNode from "@/nodes/dynamic";
 import { store, actions } from "@/stores/flow";
 import WithCopyPaste from "@/copyandpaste";
@@ -16,6 +16,7 @@ import { useSnapshot } from "valtio";
 import withBaseNode from "@/nodes/base";
 import { FlowEdge, FlowNode } from "@/node-types";
 import NodePanel from "@/components/node-panel";
+import useDrop from "ahooks/lib/useDrop";
 
 const nodeTypes = {
   dynamic: withBaseNode(DynamicNode),
@@ -35,6 +36,13 @@ function Workflow() {
     const newEdge = addEdge(params, store.edges);
     actions.setEdges(newEdge);
   }, []);
+  const dropRef = useRef(null);
+
+  useDrop(dropRef, {
+    onDom: (content: string, e) => {
+      console.log(content, e)
+    },
+  });
 
   return (
     <>
@@ -56,6 +64,7 @@ function Workflow() {
                 nodeTypes={nodeTypes}
                 fitView
                 className="bg-teal-50"
+                ref={dropRef}
               >
                 <MiniMap />
                 <Controls />

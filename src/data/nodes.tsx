@@ -7,7 +7,7 @@ import {
 import { ReactElement } from "react";
 
 // NodeTplProps 类型定义
-type NodeTplProps = {
+export type NodeTplProps = {
   name: string;
   description: string;
   icon: ReactElement | null;
@@ -26,7 +26,10 @@ const generals: Record<string, NodeTplProps> = {
     component: "",
     editComponent: "",
     category: "General",
-    data: {},
+    data: {
+      a: 1,
+      b: 2
+    },
   },
   delay: {
     name: "Delay",
